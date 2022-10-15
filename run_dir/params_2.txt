@@ -1,0 +1,21 @@
+{
+    "model": "densenet",
+    "optimizer": "adam",
+    "lr": 0.0001,
+    "weight_decay": 0.0,
+    "drop_rate": 0.0,
+    "epochs": 100,
+    "batch_size": 8,
+    "workers": 8,
+    "seed": 123456,
+    "tag": "",
+    "toy": false,
+    "save_path": "run_dir",
+    "scale": 224,
+    "horizontal_flip": true,
+    "verbose": false,
+    "scratch": false,
+    "train_weighted": true,
+    "valid_weighted": true,
+    "size": null
+}

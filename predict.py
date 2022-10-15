@@ -27,9 +27,9 @@ class Struct:
 
 
 def load_model(args, load_path, nclasses):
-    model = DenseNet(args, nclasses)
-    model.load_state_dict(torch.load(load_path), strict = False)
-    model = model.cuda()
+    model = DenseNet(args, 6)
+    model.load_state_dict(torch.load(load_path, map_location=torch.device('cpu')), strict = False)
+    # model = model.cuda()
     model.eval()
     return model
 
@@ -43,7 +43,7 @@ def get_model_predictions(args_dict, model_path, loader):
     outs = []
     # gather predictions for all images in the validation set
     for i, (inputs, labels) in enumerate(loader):
-        inputs, _ = transform_data((inputs, labels), use_gpu=True)
+        inputs, _ = transform_data((inputs, labels), use_gpu=False)
         outputs = model(inputs)
         out = torch.sigmoid(outputs).data.cpu().numpy()
         outs.append(out)
@@ -100,12 +100,10 @@ def predict_for_split(args_dicts, model_paths, split):
     return probs, thresholds, name
 
 
-def predict(model_paths, split="valid", save=True):
+def predict(model_paths, split="test", save=True):
 
     def get_model_params(model_path):
-        os.chdir('/content/GP/run_dir')
-        params = json.load(open('params.txt', 'r'))
-        os.chdir('/content/GP')        
+        params = json.load(open('run_dir/params.txt', 'r'))
         return params
 
     model_args_dicts = [get_model_params(model_path) for model_path in model_paths]
@@ -147,15 +145,3 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     predict(args.model_paths, save=True)
-
-    # save predictions
-    if os.path.exists('/content/drive/MyDrive/Chest_X-Ray_GP/Experiences/Experience_2/Predictions'):
-      foldersInDrive = [folder for folder in os.listdir('/content/drive/MyDrive/Chest_X-Ray_GP/Experiences/Experience_2/Predictions')]
-      foldersInColab = [folder for folder in os.listdir('/content/GP/predictions')]
-
-      for folder in foldersInColab:
-        if folder not in foldersInDrive:
-            shutil.copytree('/content/GP/predictions/{0}'.format(folder), '/content/drive/MyDrive/Chest_X-Ray_GP/Experiences/Experience_2/Predictions/{0}'.format(folder))
-    else:
-      shutil.copytree('/content/GP/predictions', '/content/drive/MyDrive/Chest_X-Ray_GP/Experiences/Experience_2/Predictions')
-

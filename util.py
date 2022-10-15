@@ -107,7 +107,7 @@ class Dataset(data.Dataset):
     def __getitem__(self, index):
         img = Image.open(self.img_paths[index]).convert("RGB")
         label = self.labels[index]
-        img.show()
+        # img.show()
 
         return self.transform(img), torch.LongTensor(label)
 
